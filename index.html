@@ -1,0 +1,924 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Knight Realistic — Next-Gen Assetto Corsa Graphics</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@200;300;400;500;600;700&family=Barlow+Condensed:wght@300;400;600;700&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/css/main.css">
+<style>
+/* PAGE LOADER */
+#page-loader{position:fixed;inset:0;z-index:9000;background:#050507;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1rem;transition:opacity .6s .3s}
+#page-loader.done{opacity:0;pointer-events:none}
+.loader-text{font-family:'Oswald',sans-serif;font-size:2.2rem;font-weight:700;letter-spacing:8px;text-transform:uppercase;background:linear-gradient(135deg,#ff1a2e,#ff8c00);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;animation:lpulse .8s infinite alternate}
+.loader-bar{width:200px;height:2px;background:rgba(255,255,255,.1);border-radius:1px;overflow:hidden}
+.loader-bar-fill{height:100%;background:linear-gradient(90deg,#ff1a2e,#ff8c00);animation:lbar 1s ease-out forwards}
+@keyframes lpulse{from{opacity:.4}to{opacity:1}}
+@keyframes lbar{from{width:0}to{width:100%}}
+
+/* INTERACTIVE SLIDER */
+.kr-slider-wrap{position:relative;border-radius:12px;overflow:hidden;box-shadow:0 0 60px rgba(255,26,46,.12),0 0 120px rgba(0,0,0,.5);border:1px solid rgba(255,255,255,.08);aspect-ratio:16/10;user-select:none;transition:opacity .3s;background:#0a0a12}
+.kr-slider-wrap.fading{opacity:0}
+.kr-simg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;background:#0a0a12}
+.kr-sbefore{z-index:1}
+.kr-safter{z-index:2;clip-path:inset(0 50% 0 0)}
+.kr-sline{position:absolute;top:0;bottom:0;z-index:4;width:2px;background:#fff;left:50%;transform:translateX(-50%);pointer-events:none;box-shadow:0 0 8px rgba(255,255,255,.5)}
+.kr-shandle{position:absolute;top:50%;z-index:5;width:40px;height:40px;border-radius:50%;background:#fff;border:3px solid rgba(0,0,0,.15);transform:translate(-50%,-50%);display:flex;align-items:center;justify-content:center;cursor:ew-resize;left:50%;box-shadow:0 2px 16px rgba(0,0,0,.6)}
+.kr-slabel{position:absolute;bottom:10px;z-index:6;background:rgba(0,0,0,.72);backdrop-filter:blur(8px);color:#fff;font-family:'JetBrains Mono',monospace;font-size:.62rem;font-weight:700;letter-spacing:.08em;padding:.2rem .6rem;border-radius:100px;text-transform:uppercase}
+.kr-slabel.b{left:10px}
+.kr-slabel.a{right:10px;background:rgba(255,26,46,.85)}
+.kr-nav-arrows{display:flex;justify-content:center;gap:.6rem;margin-top:.8rem}
+.kr-narrow{width:34px;height:34px;border-radius:50%;border:1.5px solid rgba(255,255,255,.12);background:rgba(255,255,255,.04);display:flex;align-items:center;justify-content:center;color:#fff;cursor:pointer;transition:all .2s}
+.kr-narrow:hover{border-color:#ff1a2e;background:rgba(255,26,46,.1)}
+.kr-idots{display:flex;gap:5px;justify-content:center;margin-top:.55rem}
+.kr-idot{width:6px;height:6px;border-radius:3px;background:rgba(255,255,255,.2);cursor:pointer;transition:all .2s}
+.kr-idot.active{background:#ff1a2e;width:18px}
+
+/* TIME TABS */
+.kr-time-tabs{display:flex;gap:.5rem;margin:1.8rem 0 1.4rem;flex-wrap:wrap}
+.kr-time-tab{flex:1;min-width:90px;padding:.55rem .8rem;border-radius:8px;border:1.5px solid rgba(255,255,255,.1);background:transparent;color:rgba(226,232,240,.5);font-family:'Oswald',sans-serif;font-weight:400;font-size:.78rem;letter-spacing:1.5px;cursor:pointer;transition:all .3s;display:flex;align-items:center;justify-content:center;gap:.3rem;text-transform:uppercase}
+.kr-time-tab.active{border-color:#ff1a2e;color:#fff;background:rgba(255,26,46,.1)}
+.kr-time-tab:hover:not(.active){color:#fff;border-color:rgba(255,255,255,.2)}
+
+/* SKIN TABS */
+.skin-tabs-row{display:flex;gap:.4rem;margin:1.5rem 0 1rem;flex-wrap:wrap}
+.skin-tab-btn{padding:.45rem 1.1rem;border-radius:6px;border:1.5px solid rgba(255,255,255,.1);background:transparent;color:rgba(226,232,240,.5);font-family:'Oswald',sans-serif;font-size:.75rem;letter-spacing:2px;cursor:pointer;transition:all .25s;text-transform:uppercase}
+.skin-tab-btn.active{border-color:#ff1a2e;color:#fff;background:rgba(255,26,46,.1)}
+.skin-tab-btn:hover:not(.active){color:#fff;border-color:rgba(255,255,255,.2)}
+
+/* SKYDOOM 2-col */
+.skydoom-layout{display:grid;grid-template-columns:1fr 1fr;gap:4rem;align-items:start}
+@media(max-width:900px){.skydoom-layout{grid-template-columns:1fr}}
+
+/* FIRE APP */
+#fireapp{background:#070710;border-top:1px solid rgba(255,255,255,.06)}
+.fire-layout{display:grid;grid-template-columns:1fr 1fr;gap:4rem;align-items:center}
+@media(max-width:900px){.fire-layout{grid-template-columns:1fr}}
+.fire-card{background:#0d0d1a;border:1px solid rgba(255,255,255,.07);border-radius:16px;padding:1.75rem;position:relative;overflow:hidden}
+.fire-vis{width:100%;aspect-ratio:16/9;background:#000;border-radius:12px;overflow:hidden;position:relative;margin-bottom:1rem}
+#fire-canvas{display:block;width:100%;height:100%}
+.fbtn{padding:.4rem .9rem;border-radius:7px;font-family:'Oswald',sans-serif;font-size:.72rem;font-weight:400;letter-spacing:1.5px;cursor:pointer;transition:all .25s;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);color:rgba(226,232,240,.7);text-transform:uppercase}
+.fbtn.active,.fbtn:hover{background:rgba(255,26,46,.15);border-color:#ff1a2e;color:#fff}
+.fire-btns-row{display:flex;gap:.55rem;flex-wrap:wrap;margin-bottom:1rem}
+.fire-int-row{display:flex;align-items:center;gap:1rem;padding-top:.9rem;border-top:1px solid rgba(255,255,255,.07)}
+.free-badge-kr{display:inline-flex;align-items:center;gap:.4rem;background:rgba(34,197,94,.1);border:1px solid rgba(34,197,94,.3);color:#4ade80;border-radius:100px;padding:.28rem .75rem;font-family:'JetBrains Mono',monospace;font-size:.62rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;margin-bottom:.9rem}
+
+/* NAV SOCIAL */
+.nav-social-link{display:inline-flex;align-items:center;gap:6px;font-family:'Oswald',sans-serif;font-weight:400;font-size:.7rem;letter-spacing:2px;text-transform:uppercase;padding:.38rem .85rem;border-radius:4px;text-decoration:none;cursor:none;transition:all .2s;border:1px solid transparent}
+.nav-yt{color:#ff4444;border-color:rgba(255,68,68,.25);background:rgba(255,68,68,.08)}
+.nav-yt:hover{background:rgba(255,68,68,.18);border-color:rgba(255,68,68,.5);color:#ff6666}
+.nav-dc{color:#a5b4fc;border-color:rgba(88,101,242,.25);background:rgba(88,101,242,.08)}
+.nav-dc:hover{background:rgba(88,101,242,.2);border-color:rgba(88,101,242,.55);color:#c7d2fe}
+
+/* FEAT ROW */
+.feat-row{display:flex;align-items:center;gap:.75rem;padding:.65rem 1rem;border-radius:8px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);margin-bottom:.55rem}
+.feat-icon{width:32px;height:32px;border-radius:7px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:.95rem}
+.feat-text{font-size:.86rem;font-weight:400;color:rgba(226,232,240,.55)}
+
+/* VIDEO SECTION */
+.kr-video-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.5rem;margin-top:1.5rem}
+@media(max-width:900px){.kr-video-grid{grid-template-columns:1fr}}
+.kr-video-item{border-radius:12px;overflow:hidden;border:1px solid rgba(255,255,255,.08);background:#0a0a12;aspect-ratio:16/9;position:relative}
+.kr-video-item video{width:100%;height:100%;object-fit:cover;display:block}
+.kr-video-item:hover video{opacity:.9}
+</style>
+</head>
+<body>
+
+<!-- PAGE LOADER -->
+<div id="page-loader">
+  <div class="loader-text">Knight Realistic</div>
+  <div class="loader-bar"><div class="loader-bar-fill"></div></div>
+</div>
+
+<div id="cur-dot"></div>
+<div id="cur-ring"></div>
+<div id="bar"></div>
+<canvas id="noise"></canvas>
+
+<!-- LANG SWITCHER -->
+<div id="lang-switcher">
+  <button class="lang-btn active" onclick="setLang('en')">EN</button>
+  <span class="lang-sep">|</span>
+  <button class="lang-btn" onclick="setLang('ar')">عر</button>
+</div>
+
+<!-- NAV -->
+<nav id="nav">
+  <a href="#hero" class="logo">
+    <div class="logo-hex">KR</div>
+    Knight Realistic
+  </a>
+  <div class="nav-links">
+    <a href="#youtube" data-en="Videos" data-ar="فيديوهات">Videos</a>
+    <a href="#filter" data-en="Filter" data-ar="فلتر">Filter</a>
+    <a href="#skins" data-en="Skins" data-ar="سكنات">Skins</a>
+    <a href="#skydoom" data-en="Sky Doom" data-ar="سكاي دوم">Sky Doom</a>
+    <a href="#knighttool" data-en="Tool" data-ar="أداة">Tool</a>
+    <a href="#updates" data-en="Updates" data-ar="تحديثات">Updates</a>
+    <a href="#pricing" data-en="Pricing" data-ar="الأسعار">Pricing</a>
+    <a href="https://www.youtube.com/@Knight_Realistic/videos" target="_blank" class="nav-social-link nav-yt">
+      <svg width="16" height="11" viewBox="0 0 18 13" fill="currentColor"><path d="M17.6 2.03A2.25 2.25 0 0 0 16.02.43C14.63 0 9 0 9 0S3.37 0 1.98.43A2.25 2.25 0 0 0 .4 2.03C0 3.44 0 6.5 0 6.5s0 3.06.4 4.47A2.25 2.25 0 0 0 1.98 12.6C3.37 13 9 13 9 13s5.63 0 7.02-.4a2.25 2.25 0 0 0 1.58-1.63C18 9.56 18 6.5 18 6.5s0-3.06-.4-4.47ZM7.16 9.25V3.75L11.89 6.5 7.16 9.25Z"/></svg>
+      YouTube
+    </a>
+    <a href="https://discord.com/invite/w5SWRTUhyS" target="_blank" class="nav-social-link nav-dc">
+      <svg width="14" height="11" viewBox="0 0 14 11" fill="currentColor"><path d="M11.86 1.15A11.6 11.6 0 0 0 9 .25a8.1 8.1 0 0 0-.37.74 10.72 10.72 0 0 0-3.26 0A8.5 8.5 0 0 0 5 .25a11.6 11.6 0 0 0-2.86.9C.3 3.58-.18 5.97.06 8.33a11.67 11.67 0 0 0 3.56 1.77 8.8 8.8 0 0 0 .77-1.22 7.56 7.56 0 0 1-1.2-.57l.29-.22a8.36 8.36 0 0 0 7.03 0c.1.08.2.15.3.22-.38.22-.78.42-1.2.57.22.43.48.84.77 1.22a11.62 11.62 0 0 0 3.55-1.77c.29-2.77-.47-5.14-1.97-7.18ZM4.68 6.85c-.7 0-1.28-.64-1.28-1.42s.57-1.42 1.28-1.42c.72 0 1.3.64 1.29 1.42 0 .78-.57 1.42-1.29 1.42Zm4.64 0c-.7 0-1.28-.64-1.28-1.42s.57-1.42 1.28-1.42c.72 0 1.3.64 1.29 1.42 0 .78-.57 1.42-1.29 1.42Z"/></svg>
+      Discord
+    </a>
+  </div>
+  <div class="nav-disc">
+    <a href="https://www.patreon.com/cw/Knight_18/membership" target="_blank" class="nav-cta" data-en="Get Access" data-ar="احصل على الوصول">Get Access</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section id="hero">
+  <div class="hero-bg">
+    <svg class="hero-svg" viewBox="0 0 1600 900" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice">
+      <defs>
+        <radialGradient id="h1" cx="50%" cy="40%" r="70%"><stop offset="0%" stop-color="#cc0011" stop-opacity=".5"/><stop offset="100%" stop-color="#000" stop-opacity="0"/></radialGradient>
+        <radialGradient id="h2" cx="18%" cy="82%" r="45%"><stop offset="0%" stop-color="#500009" stop-opacity=".42"/><stop offset="100%" stop-color="#000" stop-opacity="0"/></radialGradient>
+        <radialGradient id="h3" cx="88%" cy="14%" r="38%"><stop offset="0%" stop-color="#200007" stop-opacity=".38"/><stop offset="100%" stop-color="#000" stop-opacity="0"/></radialGradient>
+        <filter id="blur55"><feGaussianBlur stdDeviation="55"/></filter>
+      </defs>
+      <rect width="1600" height="900" fill="#050507"/>
+      <ellipse cx="800" cy="360" rx="720" ry="390" fill="url(#h1)" filter="url(#blur55)"><animate attributeName="rx" values="720;800;720" dur="9s" repeatCount="indefinite"/></ellipse>
+      <ellipse cx="290" cy="738" rx="430" ry="230" fill="url(#h2)" filter="url(#blur55)"><animate attributeName="cx" values="290;340;290" dur="12s" repeatCount="indefinite"/></ellipse>
+      <ellipse cx="1440" cy="126" rx="330" ry="190" fill="url(#h3)" filter="url(#blur55)"><animate attributeName="cy" values="126;100;126" dur="8s" repeatCount="indefinite"/></ellipse>
+      <rect x="0" y="758" width="1600" height="142" fill="#030003"/>
+    </svg>
+  </div>
+  <div class="hero-overlay"></div>
+  <div class="hero-grid"></div>
+  <div class="hero-scan"></div>
+  <div class="hero-content">
+    <div class="hero-eyebrow" data-en="v1.4 Now Live — Knight Realistic Pro" data-ar="الإصدار 1.4 متاح الآن — Knight Realistic Pro">v1.4 Now Live — Knight Realistic Pro</div>
+    <h1 class="hero-title"><span class="ht1">Knight</span><span class="ht2">Realistic</span></h1>
+    <p class="hero-sub" data-en="The most immersive visual overhaul for Assetto Corsa. Cinematic skies, ultra-realistic surfaces, and dynamic lighting that redefines what's possible." data-ar="أقوى تحديث بصري لـ Assetto Corsa. سماوات سينمائية، أسطح فائقة الواقعية، وإضاءة ديناميكية تعيد تعريف المستحيل.">The most immersive visual overhaul for Assetto Corsa. Cinematic skies, ultra-realistic surfaces, and dynamic lighting that redefines what's possible.</p>
+    <div class="hero-btns">
+      <a href="https://www.patreon.com/cw/Knight_18/membership" target="_blank" class="btn-r">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M0 .48v23.04h4.22V.48H0zm15.385 0c-4.764 0-8.641 3.88-8.641 8.65 0 4.755 3.877 8.623 8.641 8.623 4.75 0 8.615-3.868 8.615-8.623C24 4.36 20.136.48 15.385.48z"/></svg>
+        <span data-en="Subscribe on Patreon" data-ar="اشترك على Patreon">Subscribe on Patreon</span>
+      </a>
+      <a href="#filter" class="btn-o" data-en="View Before / After" data-ar="شاهد القبل / البعد">View Before / After</a>
+    </div>
+    <div class="hero-stats">
+      <div><div class="snum">50<em>K+</em></div><div class="slbl" data-en="Active Users" data-ar="مستخدم نشط">Active Users</div></div>
+      <div class="ssep"></div>
+      <div><div class="snum">4.9<em>★</em></div><div class="slbl" data-en="Avg Rating" data-ar="متوسط التقييم">Avg Rating</div></div>
+      <div class="ssep"></div>
+      <div><div class="snum">1.4</div><div class="slbl" data-en="Latest Version" data-ar="أحدث إصدار">Latest Version</div></div>
+      <div class="ssep"></div>
+      <div><div class="snum">4</div><div class="slbl" data-en="Skin Variants" data-ar="خيارات سكنات">Skin Variants</div></div>
+    </div>
+  </div>
+  <div class="scroll-ind"><div class="scroll-line"></div><div class="scroll-lbl" data-en="Scroll" data-ar="اسحب">Scroll</div></div>
+</section>
+
+<!-- TICKER -->
+<section id="ticker">
+  <div class="tick-inner">
+    <div class="tick-item"><span class="tick-dot"></span><span>Ultra Realistic Lighting</span></div>
+    <div class="tick-item"><span class="tick-dot"></span><span>Cinematic Sky — Sky Doom</span></div>
+    <div class="tick-item"><span class="tick-dot"></span><span>PPFalter Post-Processing</span></div>
+    <div class="tick-item"><span class="tick-dot"></span><span>Day / Night Cycle</span></div>
+    <div class="tick-item"><span class="tick-dot"></span><span>4 SkinSRP Variants</span></div>
+    <div class="tick-item"><span class="tick-dot"></span><span>Knight Tool — AC App</span></div>
+    <div class="tick-item"><span class="tick-dot"></span><span>Moon Godrays System</span></div>
+    <div class="tick-item"><span class="tick-dot"></span><span>Tunnel Exposure System</span></div>
+    <div class="tick-item"><span class="tick-dot"></span><span>Ultra Realistic Lighting</span></div>
+    <div class="tick-item"><span class="tick-dot"></span><span>Cinematic Sky — Sky Doom</span></div>
+    <div class="tick-item"><span class="tick-dot"></span><span>PPFalter Post-Processing</span></div>
+    <div class="tick-item"><span class="tick-dot"></span><span>4 SkinSRP Variants</span></div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════
+     YOUTUBE / VIDEOS SECTION
+     ═══════════════════════════════════════════════════ -->
+<section id="youtube">
+  <div class="wrap">
+    <div class="yt-head">
+      <div class="rev">
+        <div class="sec-lbl" data-en="Latest Videos" data-ar="أحدث الفيديوهات">Latest Videos</div>
+        <h2 class="sec-title" data-en="Watch The Magic" data-ar="شاهد السحر">Watch The Magic</h2>
+        <p class="sec-desc" data-en="Real gameplay, zero post-editing. Every video showcases Knight Realistic mods in their full cinematic glory." data-ar="لعب حقيقي، بدون تعديل.">Real gameplay, zero post-editing. Every video showcases Knight Realistic mods in their full cinematic glory.</p>
+      </div>
+      <div class="rev" style="transition-delay:.15s">
+        <a href="https://www.youtube.com/@Knight_Realistic/videos" target="_blank" class="yt-sub-btn">
+          <svg width="18" height="13" viewBox="0 0 18 13" fill="currentColor"><path d="M17.6 2.03A2.25 2.25 0 0 0 16.02.43C14.63 0 9 0 9 0S3.37 0 1.98.43A2.25 2.25 0 0 0 .4 2.03C0 3.44 0 6.5 0 6.5s0 3.06.4 4.47A2.25 2.25 0 0 0 1.98 12.6C3.37 13 9 13 9 13s5.63 0 7.02-.4a2.25 2.25 0 0 0 1.58-1.63C18 9.56 18 6.5 18 6.5s0-3.06-.4-4.47ZM7.16 9.25V3.75L11.89 6.5 7.16 9.25Z"/></svg>
+          <span data-en="Subscribe" data-ar="اشترك">Subscribe</span>
+        </a>
+      </div>
+    </div>
+
+    <!-- ✅ YOUTUBE VIDEOS EMBED -->
+<div class="kr-video-grid rev" style="transition-delay:.2s">
+  <!-- فيديو 1 -->
+  <div class="kr-video-item">
+    <iframe 
+      width="100%" 
+      height="100%" 
+      src="https://www.youtube.com/embed/a-W9P_AX2-E?autoplay=1&mute=1&loop=1&playlist=a-W9P_AX2-E&rel=0&controls=0&modestbranding=1&playsinline=1" 
+      title="Knight Realistic Video 1" 
+      frameborder="0" 
+      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+      allowfullscreen>
+    </iframe>
+  </div>
+
+  <!-- فيديو 2 -->
+  <div class="kr-video-item">
+    <iframe 
+      width="100%" 
+      height="100%" 
+      src="https://www.youtube.com/embed/1Yox2lZ7rB8?autoplay=1&mute=1&loop=1&playlist=1Yox2lZ7rB8&rel=0&controls=0&modestbranding=1&playsinline=1" 
+      title="Knight Realistic Video 2" 
+      frameborder="0" 
+      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+      allowfullscreen>
+    </iframe>
+  </div>
+
+  <!-- فيديو 3 -->
+  <div class="kr-video-item">
+    <iframe 
+      width="100%" 
+      height="100%" 
+      src="https://www.youtube.com/embed/x8vtjhmE6aY?autoplay=1&mute=1&loop=1&playlist=x8vtjhmE6aY&rel=0&controls=0&modestbranding=1&playsinline=1" 
+      title="Knight Realistic Video 3" 
+      frameborder="0" 
+      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+      allowfullscreen>
+    </iframe>
+  </div>
+</div>
+
+    <div class="rev" style="transition-delay:.35s;text-align:center;margin-top:2rem">
+      <a href="https://www.youtube.com/@Knight_Realistic/videos" target="_blank" class="btn-o" data-en="View All Videos →" data-ar="مشاهدة جميع الفيديوهات →">View All Videos →</a>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════
+     SKY DOOM SECTION  — real images from /sky/
+     ═══════════════════════════════════════════════════ -->
+<section id="skydoom">
+  <div class="wrap">
+    <div class="skydoom-layout">
+      <div class="rev">
+        <div class="sec-lbl" data-en="Sky Doom System" data-ar="نظام Sky Doom">Sky Doom System</div>
+        <h2 class="sec-title" data-en="Sky Doom" data-ar="Sky Doom">Sky Doom</h2>
+        <p class="sec-desc" data-en="More realistic than Pure itself. Dynamic clouds and natural lighting across morning, afternoon, and night — 12 unique sky compositions with real-time before/after comparison." data-ar="أكثر واقعية من Pure نفسه. سحب ديناميكية وإضاءة طبيعية — 12 تشكيلة سماء فريدة مع مقارنة قبل/بعد.">More realistic than Pure itself. Dynamic clouds and natural lighting across morning, afternoon, and night — 12 unique sky compositions.</p>
+        <div class="kr-time-tabs">
+          <button class="kr-time-tab active" onclick="skySetTime('morning',this)">🌅 Morning</button>
+          <button class="kr-time-tab" onclick="skySetTime('afternoon',this)">☀️ Afternoon</button>
+          <button class="kr-time-tab" onclick="skySetTime('night',this)">🌙 Night</button>
+        </div>
+        <div class="feat-row"><div class="feat-icon" style="background:rgba(59,130,246,.15)">☁️</div><span class="feat-text" data-en="Dynamic clouds with time-of-day variation" data-ar="سحب ديناميكية تتغير مع الوقت">Dynamic clouds with time-of-day variation</span></div>
+        <div class="feat-row"><div class="feat-icon" style="background:rgba(245,158,11,.15)">🌅</div><span class="feat-text" data-en="Advanced natural lighting & sun angle response" data-ar="إضاءة طبيعية متقدمة وتفاعل مع زاوية الشمس">Advanced natural lighting & sun angle response</span></div>
+        <div class="feat-row"><div class="feat-icon" style="background:rgba(139,92,246,.15)">✨</div><span class="feat-text" data-en="12 unique sky views across 3 time periods" data-ar="12 تشكيلة سماء عبر 3 أوقات">12 unique sky views across 3 time periods</span></div>
+        <div class="feat-row"><div class="feat-icon" style="background:rgba(16,185,129,.15)">⚡</div><span class="feat-text" data-en="Optimized — no FPS sacrifice" data-ar="محسّن — بدون خسارة في الأداء">Optimized — no FPS sacrifice</span></div>
+        <div style="margin-top:1.5rem">
+          <a href="https://www.patreon.com/cw/Knight_18/membership" target="_blank" class="btn-r">
+            <span data-en="Get Sky Doom →" data-ar="احصل على Sky Doom →">Get Sky Doom →</span>
+          </a>
+        </div>
+      </div>
+      <div class="rev" style="transition-delay:.2s">
+        <div class="kr-slider-wrap" id="sky-slider">
+          <!-- src swapped by JS using real image paths -->
+          <img class="kr-simg kr-sbefore" id="sky-before" src="sky/morning/sky112d.jpg" alt="Vanilla sky" loading="lazy">
+          <img class="kr-simg kr-safter"  id="sky-after"  src="sky/morning/sky112.jpg"  alt="Sky Doom"   loading="lazy">
+          <div class="kr-sline" id="sky-line"></div>
+          <div class="kr-shandle" id="sky-handle">
+            <svg width="16" height="16" fill="none" stroke="#333" stroke-width="2.5" viewBox="0 0 24 24"><path d="M9 18l-6-6 6-6M15 6l6 6-6 6"/></svg>
+          </div>
+          <div class="kr-slabel b" data-en="VANILLA" data-ar="الأصلي">VANILLA</div>
+          <div class="kr-slabel a">SKY DOOM</div>
+        </div>
+        <div class="kr-nav-arrows">
+          <div class="kr-narrow" onclick="skyPrev()"><svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg></div>
+          <div class="kr-narrow" onclick="skyNext()"><svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg></div>
+        </div>
+        <div class="kr-idots" id="sky-dots">
+          <div class="kr-idot active" onclick="skySetImg(0)"></div>
+          <div class="kr-idot" onclick="skySetImg(1)"></div>
+          <div class="kr-idot" onclick="skySetImg(2)"></div>
+          <div class="kr-idot" onclick="skySetImg(3)"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════
+     FILTER SECTION — real images day/night
+     ═══════════════════════════════════════════════════ -->
+<section id="filter">
+  <div class="wrap">
+    <div class="filter-layout">
+      <div>
+        <div class="rev">
+          <div class="sec-lbl" data-en="PPFalter Filter" data-ar="فلتر PPFalter">PPFalter Filter</div>
+          <h2 class="sec-title" data-en="The Filter" data-ar="الفلتر">The Filter</h2>
+          <div class="filter-desc-box">
+            <p data-en="Knight Realistic Pro is a complete post-processing filter for Assetto Corsa built on the Pure platform." data-ar="Knight Realistic Pro هو فلتر معالجة بصرية متكامل لـ Assetto Corsa مبني على منصة Pure.">Knight Realistic Pro is a complete post-processing filter for Assetto Corsa built on the Pure platform. A fully dynamic lighting system that reacts to time of day, weather conditions, and your camera position.</p>
+            <ul class="filter-feats">
+              <li data-en="Dynamic tunnel exposure with flash effect on exit" data-ar="تعرض النفق الديناميكي مع تأثير الفلاش عند الخروج">Dynamic tunnel exposure with flash effect on exit</li>
+              <li data-en="Sun & Moon dual godray system — 4 modes each" data-ar="نظام أشعة مزدوج للشمس والقمر — 4 أوضاع لكل منهما">Sun & Moon dual godray system — 4 modes each</li>
+              <li data-en="5 advanced bloom presets (Star, Natural, Custom)" data-ar="5 إعدادات bloom متقدمة">5 advanced bloom presets (Star, Natural, Custom)</li>
+              <li data-en="Adaptive tonemapping (ACES Filmic / Unreal Engine)" data-ar="تحديد نطاق الألوان التكيفي">Adaptive tonemapping (ACES Filmic / Unreal Engine)</li>
+              <li data-en="9 color grading presets (Autumn, Summer, Night Crawler…)" data-ar="9 إعدادات تدرج ألوان">9 color grading presets (Autumn, Summer, Night Crawler…)</li>
+              <li data-en="World lighting LUT — 12-point sun elevation table" data-ar="LUT إضاءة العالم — جدول 12 نقطة">World lighting LUT — 12-point sun elevation table</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <div class="rev" style="transition-delay:.15s">
+        <div class="kr-time-tabs">
+          <button class="kr-time-tab active" onclick="filterSetTime('day',this)">☀️ Day</button>
+          <button class="kr-time-tab" onclick="filterSetTime('sunset',this)">🌅 Sunset</button>
+          <button class="kr-time-tab" onclick="filterSetTime('night',this)">🌙 Night</button>
+        </div>
+        <div class="kr-slider-wrap" id="filter-slider">
+          <!-- day-before/after are the base; sunset/night swap same pair -->
+          <img class="kr-simg kr-sbefore" id="filter-before" src="assets/images/day-before.jpg" alt="Vanilla" loading="lazy">
+          <img class="kr-simg kr-safter"  id="filter-after"  src="assets/images/day-after.jpg"  alt="Filter"  loading="lazy">
+          <div class="kr-sline" id="filter-line"></div>
+          <div class="kr-shandle" id="filter-handle">
+            <svg width="16" height="16" fill="none" stroke="#333" stroke-width="2.5" viewBox="0 0 24 24"><path d="M9 18l-6-6 6-6M15 6l6 6-6 6"/></svg>
+          </div>
+          <div class="kr-slabel b" data-en="VANILLA" data-ar="الأصلي">VANILLA</div>
+          <div class="kr-slabel a" data-en="FILTER" data-ar="الفلتر">FILTER</div>
+        </div>
+        <!-- no nav dots needed for filter — only 2 images (day/night) -->
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════
+     SKINS SECTION — real images from assets/images/
+     ═══════════════════════════════════════════════════ -->
+<section id="skins">
+  <div class="wrap">
+    <div class="rev">
+      <div class="sec-lbl" data-en="SkinSRP — Texture Overhaul" data-ar="SkinSRP — تحديث القوام">SkinSRP — Texture Overhaul</div>
+      <h2 class="sec-title" data-en="4 Skin Variants" data-ar="4 خيارات سكنات">4 Skin Variants</h2>
+      <p class="sec-desc" data-en="Ultra-high-res PBR texture packs for terrain, vegetation, and surfaces. Four unique color palettes — each transforms the visual atmosphere of the entire world." data-ar="حزم قوام PBR عالية الدقة للتضاريس والنباتات والأسطح. أربعة لوحات ألوان فريدة.">Ultra-high-res PBR texture packs for terrain, vegetation, and surfaces. Four unique color palettes — each transforms the visual atmosphere of the entire world.</p>
+    </div>
+    <div class="skin-tabs-row rev" style="transition-delay:.1s">
+      <button class="skin-tab-btn active" onclick="skinSetVariant('default',this)">Default</button>
+      <button class="skin-tab-btn" onclick="skinSetVariant('v12',this)">SkinSRP v1.2</button>
+      <button class="skin-tab-btn" onclick="skinSetVariant('v13',this)">SkinSRP v1.3</button>
+      <button class="skin-tab-btn" onclick="skinSetVariant('v14',this)">SkinSRP v1.4</button>
+    </div>
+    <div class="rev" style="transition-delay:.2s;max-width:860px;margin:0 auto">
+      <div class="kr-slider-wrap" id="skin-slider">
+        <img class="kr-simg kr-sbefore" id="skin-before" src="assets/images/skins default_1.jpg" alt="Default" loading="lazy">
+        <img class="kr-simg kr-safter"  id="skin-after"  src="assets/images/skins v1.2_1.jpg"   alt="Skin"    loading="lazy">
+        <div class="kr-sline" id="skin-line"></div>
+        <div class="kr-shandle" id="skin-handle">
+          <svg width="14" height="14" fill="none" stroke="#333" stroke-width="2.5" viewBox="0 0 24 24"><path d="M9 18l-6-6 6-6M15 6l6 6-6 6"/></svg>
+        </div>
+        <div class="kr-slabel b" data-en="DEFAULT" data-ar="الأصلي">DEFAULT</div>
+        <div class="kr-slabel a" id="skin-after-label">SkinSRP v1.2</div>
+      </div>
+      <div class="kr-nav-arrows" style="margin-top:.8rem">
+        <div class="kr-narrow" onclick="skinPrev()"><svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg></div>
+        <div class="kr-narrow" onclick="skinNext()"><svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg></div>
+      </div>
+      <div class="kr-idots" id="skin-dots">
+        <div class="kr-idot active" onclick="skinSetImg(0)"></div>
+        <div class="kr-idot" onclick="skinSetImg(1)"></div>
+        <div class="kr-idot" onclick="skinSetImg(2)"></div>
+        <div class="kr-idot" onclick="skinSetImg(3)"></div>
+        <div class="kr-idot" onclick="skinSetImg(4)"></div>
+        <div class="kr-idot" onclick="skinSetImg(5)"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- KNIGHT TOOL -->
+<section id="knighttool">
+  <div class="wrap">
+    <div class="tool-layout">
+      <div class="rev">
+        <div class="sec-lbl" data-en="Exclusive App" data-ar="تطبيق حصري">Exclusive App</div>
+        <h2 class="sec-title" data-en="Knight Tool" data-ar="أداة Knight">Knight Tool</h2>
+        <p class="sec-desc" data-en="An all-in-one Assetto Corsa CSP app with three powerful modules. Built for the Knight Realistic community." data-ar="تطبيق CSP متكامل لـ Assetto Corsa بثلاثة وحدات قوية.">An all-in-one Assetto Corsa CSP app with three powerful modules. Built for the Knight Realistic community.</p>
+        <ul class="tool-modules">
+          <li class="tool-module">
+            <div class="tool-mod-name">🗺️ <span data-en="Track Skin Changer" data-ar="مغير سكن المضمار">Track Skin Changer</span></div>
+            <div class="tool-mod-desc" data-en="Grid UI with preview thumbnails for all installed track skins. Instant apply with backup system." data-ar="واجهة شبكية مع صور مصغرة. تطبيق فوري مع نظام نسخ احتياطي.">Grid UI with preview thumbnails for all installed track skins. Instant apply with backup system.</div>
+          </li>
+          <li class="tool-module">
+            <div class="tool-mod-name">💡 <span data-en="Underglow System" data-ar="نظام الإضاءة السفلية">Underglow System</span></div>
+            <div class="tool-mod-desc" data-en="Real-time underglow lighting with 12 color presets, 8 animation modes including Police, Rainbow, Strobe." data-ar="إضاءة سفلية في الوقت الفعلي مع 12 إعداد ألوان و8 أوضاع حركة.">Real-time underglow lighting with 12 color presets, 8 animation modes.</div>
+          </li>
+          <li class="tool-module">
+            <div class="tool-mod-name">🔥 <span data-en="Flame Tuner" data-ar="ضابط اللهب">Flame Tuner</span></div>
+            <div class="tool-mod-desc" data-en="Live exhaust flame tuning with 6 presets and 10 flame colors. Real-time preview as you adjust." data-ar="ضبط لهب العادم المباشر مع 6 إعدادات و10 ألوان لهب.">Live exhaust flame tuning with 6 presets and 10 flame colors.</div>
+          </li>
+        </ul>
+        <div style="margin-top:1.5rem">
+          <a href="https://www.patreon.com/cw/Knight_18/membership" target="_blank" class="btn-r">
+            <span data-en="Get Knight Tool Access" data-ar="احصل على صلاحية أداة Knight">Get Knight Tool Access</span>
+          </a>
+        </div>
+      </div>
+      <div class="rev" style="transition-delay:.2s">
+        <div class="tool-visual">
+          <div class="tool-visual-header">
+            <div class="tv-dot" style="background:#ff5f57"></div>
+            <div class="tv-dot" style="background:#febc2e;margin-left:5px"></div>
+            <div class="tv-dot" style="background:#28c840;margin-left:5px"></div>
+            <span style="font-family:'JetBrains Mono',monospace;font-size:.65rem;letter-spacing:2px;color:var(--r);margin-left:1rem;text-transform:uppercase">Knight Tool v1</span>
+            <span style="font-family:'JetBrains Mono',monospace;font-size:.58rem;color:var(--dim2);margin-left:auto">Licensed</span>
+          </div>
+          <div class="tool-visual-body">
+            <div style="display:flex;gap:4px;margin-bottom:1.2rem">
+              <div style="padding:.3rem .8rem;background:var(--rgg);border:1px solid var(--bdr2);border-radius:3px;font-family:'Oswald',sans-serif;font-size:.72rem;font-weight:500;color:var(--r);text-transform:uppercase;letter-spacing:1.5px">Track</div>
+              <div style="padding:.3rem .8rem;background:rgba(255,255,255,.03);border:1px solid var(--bdr);border-radius:3px;font-family:'Oswald',sans-serif;font-size:.72rem;font-weight:400;color:var(--dim);text-transform:uppercase;letter-spacing:1.5px">Glow</div>
+              <div style="padding:.3rem .8rem;background:rgba(255,100,0,.08);border:1px solid rgba(255,100,0,.2);border-radius:3px;font-family:'Oswald',sans-serif;font-size:.72rem;font-weight:400;color:rgba(255,150,50,.7);text-transform:uppercase;letter-spacing:1.5px">Flames</div>
+            </div>
+            <div style="display:flex;align-items:center;gap:.6rem;margin:.5rem 0">
+              <span class="tool-ui-label" style="flex-shrink:0;min-width:70px">Brightness</span>
+              <div class="tool-slider" style="flex:1"><div class="tool-slider-fill" style="width:72%"></div><div class="tool-slider-thumb" style="left:calc(72% - 4px)"></div></div>
+              <span class="tool-ui-val">18.0</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:.6rem;margin:.5rem 0">
+              <span class="tool-ui-label" style="flex-shrink:0;min-width:70px">Flame Intensity</span>
+              <div class="tool-slider" style="flex:1"><div class="tool-slider-fill" style="width:45%;background:rgba(255,120,20,.8)"></div><div class="tool-slider-thumb" style="left:calc(45% - 4px);background:rgba(255,150,50,.9);box-shadow:0 0 8px rgba(255,100,0,.5)"></div></div>
+              <span class="tool-ui-val" style="color:rgba(255,150,50,.8)">1.0x</span>
+            </div>
+            <div style="margin-top:1rem;padding:.5rem .8rem;background:rgba(34,197,94,.06);border:1px solid rgba(34,197,94,.15);border-radius:3px;font-family:'JetBrains Mono',monospace;font-size:.6rem;color:#4ade80;letter-spacing:1.5px;text-transform:uppercase">✓ Saved & applied live!</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- UPDATES -->
+<section id="updates">
+  <div class="wrap">
+    <div class="rev">
+      <div class="sec-lbl" data-en="Changelog" data-ar="سجل التغييرات">Changelog</div>
+      <h2 class="sec-title" data-en="Latest Updates" data-ar="أحدث التحديثات">Latest Updates</h2>
+      <p class="sec-desc" data-en="Track every release. All features, fixes, and improvements documented here." data-ar="تابع كل إصدار.">Track every release. All features, fixes, and improvements documented here.</p>
+    </div>
+    <div class="updates-layout">
+      <div class="upd-tabs rev" style="transition-delay:.1s">
+        <button class="upd-tab active" onclick="switchUpd('v14',this)">
+  <div class="upd-badge new">New</div>
+  <div class="upd-tab-ver">Filter v1.4</div>
+  <div class="upd-tab-date">March 2025</div>
+</button>
+
+<!-- v1.3 -->
+<button class="upd-tab" onclick="switchUpd('v13',this)">
+  <div class="upd-badge stable">Stable</div>
+  <div class="upd-tab-ver">Filter v1.3</div>
+  <div class="upd-tab-date">December 2025</div>  <!-- غيّرت من November 2024 -->
+</button>
+
+<!-- v1.2 -->
+<button class="upd-tab" onclick="switchUpd('v12',this)">
+  <div class="upd-badge stable">Stable</div>
+  <div class="upd-tab-ver">Filter v1.2</div>
+  <div class="upd-tab-date">September 2025</div>  <!-- غيّرت من August 2024 -->
+</button>
+      </div>
+      <div class="rev" style="transition-delay:.2s">
+        <div class="upd-content active" id="uc-v14">
+          <div class="upd-heading">Filter v1.4 — Complete System Overhaul</div>
+          <p class="upd-lead">
+  The most powerful filter yet — v1.4 surpasses both v1.2 and v1.3 in every way. 
+  A completely rebuilt world lighting system, new Tunnel Exposure LUT with flash effect, 
+  and a dual Sun+Moon godray system that makes previous versions look outdated.
+</p>
+          <ul class="changelog">
+            <li><span class="ct new">NEW</span><span>Tunnel Exposure System — 9-point LUT with flash on exit</span></li>
+            <li><span class="ct new">NEW</span><span>World Lighting LUT — 12-point sun elevation table</span></li>
+            <li><span class="ct new">NEW</span><span>Dual Godray System — Sun & Moon simultaneously</span></li>
+            <li><span class="ct new">NEW</span><span>5 Bloom presets including Star 8-point and Custom</span></li>
+            <li><span class="ct add">ADD</span><span>3 new LUT presets: Autumn, Summer, Metropolitan Pure</span></li>
+            <li><span class="ct upd">UPD</span><span>Shader pipeline optimized — avg +8 FPS on mid-range GPUs</span></li>
+            <li><span class="ct fix">FIX</span><span>Resolved flicker at ultrawide resolutions</span></li>
+          </ul>
+        </div>
+        <div class="upd-content" id="uc-skin14">
+          <div class="upd-heading">SkinSRP v1.4 — New Surface System</div>
+          <p class="upd-lead">SkinSRP now ships with a completely new surface material system.</p>
+          <ul class="changelog">
+            <li><span class="ct new">NEW</span><span>Red Trees Edition — deep crimson tree canopy</span></li>
+            <li><span class="ct new">NEW</span><span>New surface material system with improved PBR</span></li>
+            <li><span class="ct upd">UPD</span><span>All previous variants re-exported at higher quality</span></li>
+            <li><span class="ct fix">FIX</span><span>Fixed texture seam on coastal terrain sections</span></li>
+          </ul>
+        </div>
+        <div class="upd-content" id="uc-tool">
+          <div class="upd-heading">Knight Tool v1 — All-In-One AC App</div>
+          <p class="upd-lead">Brand new exclusive app for Assetto Corsa. Three powerful modules in one package.</p>
+          <ul class="changelog">
+            <li><span class="ct new">NEW</span><span>Track Skin Changer with grid UI & live preview</span></li>
+            <li><span class="ct new">NEW</span><span>Underglow System — 12 colors, 8 animation modes</span></li>
+            <li><span class="ct new">NEW</span><span>Flame Tuner — 6 presets, 10 colors, live preview</span></li>
+            <li><span class="ct add">ADD</span><span>Police mode (Red/Blue alternating underglow)</span></li>
+            <li><span class="ct add">ADD</span><span>Keyboard shortcuts for skin navigation [Y]/[U]/[R]</span></li>
+          </ul>
+        </div>
+        <div class="upd-content" id="uc-v13">
+          <div class="upd-heading">Filter v1.3 — Sky Modes & Multi-Color Trees</div>
+<p class="upd-lead">
+  Released December 2025. A solid update that introduced new sky modes — 
+  superseded by v1.4 which takes everything further.
+</p>
+          <ul class="changelog">
+            <li><span class="ct new">NEW</span><span>Sky Doom: Golden Hour sky mode</span></li>
+            <li><span class="ct new">NEW</span><span>Sky Doom: Midnight Storm with volumetric lightning</span></li>
+            <li><span class="ct fix">FIX</span><span>Fixed cloud pop-in during fast travel</span></li>
+          </ul>
+        </div>
+        <div class="upd-content" id="uc-v12">
+          <div class="upd-heading">Filter v1.2 — PBR Textures & LUT Overhaul</div>
+<p class="upd-lead">
+  Released September 2025. The foundation that started it all — 
+  now fully surpassed by v1.4.
+</p>
+          <ul class="changelog">
+            <li><span class="ct new">NEW</span><span>SkinSRP v1.2: Full PBR texture maps</span></li>
+            <li><span class="ct new">NEW</span><span>PPFalter: Reworked color science engine</span></li>
+            <li><span class="ct add">ADD</span><span>9 new LUT presets</span></li>
+            <li><span class="ct fix">FIX</span><span>Fixed texture seam on coastal terrain</span></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FIRE CONTROL APP -->
+<section id="fireapp">
+  <div class="wrap">
+    <div class="fire-layout">
+      <div class="rev">
+        <div class="free-badge-kr">✅ 100% Free</div>
+        <div class="sec-lbl" data-en="Free Tool" data-ar="أداة مجانية">Free Tool</div>
+        <h2 class="sec-title" data-en="Fire Control App" data-ar="تطبيق التحكم باللهب">Fire Control App</h2>
+        <p class="sec-desc" data-en="Full control over every flame, exhaust effect, and color in Assetto Corsa. One click — total transformation. No paywalls, ever." data-ar="تحكم كامل في كل لهب وتأثير عادم ولون في Assetto Corsa. نقرة واحدة — تحول كامل. بدون اشتراك أبداً.">Full control over every flame, exhaust effect, and color in Assetto Corsa. One click — total transformation. No paywalls, ever.</p>
+        <div style="margin-top:1.4rem">
+          <div class="feat-row"><div class="feat-icon" style="background:rgba(255,26,46,.15)">🔥</div><span class="feat-text" data-en="Control fire effects and intensity in real time" data-ar="التحكم في تأثيرات النار في الوقت الفعلي">Control fire effects and intensity in real time</span></div>
+          <div class="feat-row"><div class="feat-icon" style="background:rgba(245,158,11,.15)">🎨</div><span class="feat-text" data-en="Adjust flame colors with live preview" data-ar="ضبط ألوان اللهب مع معاينة مباشرة">Adjust flame colors with live preview</span></div>
+          <div class="feat-row"><div class="feat-icon" style="background:rgba(34,197,94,.15)">⚡</div><span class="feat-text" data-en="One-button apply — everything changes instantly" data-ar="زر واحد للتطبيق — كل شيء يتغير فوراً">One-button apply — everything changes instantly</span></div>
+        </div>
+        <div style="margin-top:1.5rem;display:flex;gap:.8rem;flex-wrap:wrap">
+          <a href="https://youtu.be/egkI92Vyxj8" target="_blank" class="btn-r">
+            <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polygon points="10,8 16,12 10,16" fill="currentColor" stroke="none"/></svg>
+            <span data-en="Watch Demo" data-ar="شاهد العرض">Watch Demo</span>
+          </a>
+<a href="https://www.patreon.com/posts/app-custom-for-149496969" target="_blank" class="btn-o" data-en="Free Download" data-ar="تحميل مجاني">Free Download</a>
+        </div>
+      </div>
+      <div class="rev" style="transition-delay:.2s">
+        <div class="fire-card">
+          <div class="fire-vis">
+            <canvas id="fire-canvas"></canvas>
+          </div>
+          <div class="fire-btns-row">
+            <button class="fbtn active" onclick="setFire('classic',this)">🔥 Classic</button>
+            <button class="fbtn" onclick="setFire('blue',this)">💙 Blue</button>
+            <button class="fbtn" onclick="setFire('green',this)">💚 Toxic</button>
+            <button class="fbtn" onclick="setFire('white',this)">⚡ White Hot</button>
+          </div>
+          <div class="fire-int-row">
+            <div style="flex:1">
+              <div style="font-size:.7rem;color:var(--dim2);font-family:'JetBrains Mono',monospace;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:.4rem" data-en="Flame Intensity" data-ar="شدة اللهب">Flame Intensity</div>
+              <input type="range" id="fire-slider" min="0" max="100" value="70" style="width:100%;accent-color:#ff1a2e" oninput="setFireInt(this.value)">
+            </div>
+            <div style="text-align:right;min-width:50px">
+              <div style="font-size:1.1rem;font-weight:800;color:#fff" id="fire-val">70%</div>
+              <div style="font-size:.65rem;color:var(--dim2);font-family:'JetBrains Mono',monospace;text-transform:uppercase">Power</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PRICING -->
+<section id="pricing">
+  <div class="wrap">
+    <div class="rev" style="text-align:center">
+      <div class="sec-lbl" style="justify-content:center" data-en="Pricing" data-ar="الأسعار">Pricing</div>
+      <h2 class="sec-title" style="text-align:center" data-en="Choose Your Plan" data-ar="اختر خطتك">Choose Your Plan</h2>
+      <p class="sec-desc" style="text-align:center;margin:0 auto" data-en="Monthly access. Cancel anytime. All purchases via Patreon." data-ar="وصول شهري. إلغاء في أي وقت.">Monthly access. Cancel anytime.</p>
+    </div>
+    <div class="price-grid rev" style="transition-delay:.2s">
+      <div class="price-card">
+        <div class="plan-tier" data-en="Tier 1 — Performance & Camera" data-ar="المستوى 1 — الأداء والكاميرا">Tier 1 — Performance & Camera</div>
+        <div class="plan-price"><sup>$</sup>3</div>
+        <div class="plan-period" data-en="per month" data-ar="شهرياً">per month</div>
+        <div class="plan-div"></div>
+        <ul class="plan-feats">
+          <li><span class="ck">✓</span><span data-en="Chaser camera setup" data-ar="إعداد كاميرا المطاردة">Chaser camera setup</span></li>
+          <li><span class="ck">✓</span><span data-en="Optimized game settings" data-ar="إعدادات لعبة محسّنة">Optimized game settings</span></li>
+          <li><span class="ck">✓</span><span data-en="FPS & stability improvements" data-ar="تحسينات الإطارات والاستقرار">FPS & stability improvements</span></li>
+          <li><span class="ck">✓</span><span data-en="Discord community access" data-ar="الوصول إلى مجتمع Discord">Discord community access</span></li>
+          <li class="off"><span class="ck">–</span><span data-en="PP Filter (PPFalter)" data-ar="فلتر PP">PP Filter (PPFalter)</span></li>
+          <li class="off"><span class="ck">–</span><span data-en="SkinSRP textures" data-ar="قوام SkinSRP">SkinSRP textures</span></li>
+        </ul>
+        <a href="https://www.patreon.com/cw/Knight_18/membership" target="_blank" class="btn-o" style="width:100%;text-align:center;display:block" data-en="Subscribe — $3/mo" data-ar="اشترك — 3$/شهر">Subscribe — $3/mo</a>
+      </div>
+      <div class="price-card">
+        <div class="plan-tier" data-en="Tier 2 — Visual Enthusiast" data-ar="المستوى 2 — عاشق البصريات">Tier 2 — Visual Enthusiast</div>
+        <div class="plan-price"><sup>$</sup>10</div>
+        <div class="plan-period" data-en="per month" data-ar="شهرياً">per month</div>
+        <div class="plan-div"></div>
+        <ul class="plan-feats">
+          <li><span class="ck">✓</span><span data-en="Everything in Tier 1" data-ar="كل شيء في المستوى 1">Everything in Tier 1</span></li>
+          <li><span class="ck">✓</span><span data-en="PP Filter — photorealistic graphics" data-ar="فلتر PP — رسوميات فائقة الواقعية">PP Filter — photorealistic graphics</span></li>
+          <li><span class="ck">✓</span><span data-en="SkinSRP: 1 premium skin" data-ar="SkinSRP: سكن فاخر واحد">SkinSRP: 1 premium skin</span></li>
+          <li><span class="ck">✓</span><span data-en="Discord role included" data-ar="دور Discord مضمّن">Discord role included</span></li>
+          <li class="off"><span class="ck">–</span><span data-en="All SkinSRP variants" data-ar="جميع خيارات SkinSRP">All SkinSRP variants</span></li>
+          <li class="off"><span class="ck">–</span><span data-en="Knight Tool app" data-ar="تطبيق Knight Tool">Knight Tool app</span></li>
+        </ul>
+        <a href="https://www.patreon.com/cw/Knight_18/membership" target="_blank" class="btn-o" style="width:100%;text-align:center;display:block" data-en="Subscribe — $10/mo" data-ar="اشترك — 10$/شهر">Subscribe — $10/mo</a>
+      </div>
+      <div class="price-card popular">
+        <div class="popular-badge" data-en="🚀 Most Popular" data-ar="🚀 الأكثر شعبية">🚀 Most Popular</div>
+        <div class="plan-tier" data-en="Tier 3 — Ultimate Pack" data-ar="المستوى 3 — الحزمة الكاملة">Tier 3 — Ultimate Pack</div>
+        <div class="plan-price"><sup>$</sup>15</div>
+        <div class="plan-period" data-en="per month" data-ar="شهرياً">per month</div>
+        <div class="plan-div"></div>
+        <ul class="plan-feats">
+          <li><span class="ck">✓</span><span data-en="Everything from Tier 1 & Tier 2" data-ar="كل شيء من المستوى 1 و2">Everything from Tier 1 & Tier 2</span></li>
+          <li><span class="ck">✓</span><span data-en="Sky Doom v1 — full sky system" data-ar="Sky Doom v1 — نظام سماء كامل">Sky Doom v1 — full sky system</span></li>
+          <li><span class="ck">✓</span><span data-en="SRP Map Skins — 4 variants" data-ar="سكنات خريطة SRP — 4 خيارات">SRP Map Skins — 4 variants</span></li>
+          <li><span class="ck">✓</span><span data-en="Knight Tool app access" data-ar="الوصول إلى تطبيق Knight Tool">Knight Tool app access</span></li>
+          <li><span class="ck">✓</span><span data-en="Priority updates & support" data-ar="تحديثات ودعم ذو أولوية">Priority updates & support</span></li>
+          <li><span class="ck">✓</span><span data-en="Device-based optimization" data-ar="تحسين قائم على الجهاز">Device-based optimization</span></li>
+        </ul>
+        <a href="https://www.patreon.com/cw/Knight_18/membership" target="_blank" class="btn-r" style="width:100%;text-align:center;display:block" data-en="Subscribe — $15/mo" data-ar="اشترك — 15$/شهر">Subscribe — $15/mo</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- COMMUNITY -->
+<section id="community">
+  <div class="wrap">
+    <div class="community-inner rev">
+      <div class="sec-lbl" style="justify-content:center" data-en="Community" data-ar="المجتمع">Community</div>
+      <h2 class="sec-title" style="text-align:center" data-en="Join The Community" data-ar="انضم إلى المجتمع">Join The Community</h2>
+      <p class="sec-desc" style="text-align:center;margin:0 auto" data-en="Get support, share screenshots, and be first to know about new releases." data-ar="احصل على الدعم، شارك لقطاتك، وكن أول من يعرف عن الإصدارات الجديدة.">Get support, share screenshots, and be first to know about new releases.</p>
+      <div class="disc-card">
+        <div class="disc-info">
+          <div class="disc-name">Knight Realistic Discord</div>
+          <div class="disc-desc" data-en="Join for installation help, exclusive previews, and direct access to the creator." data-ar="انضم للحصول على مساعدة التثبيت والمعاينات الحصرية.">Join for installation help, exclusive previews, and direct access to the creator.</div>
+        </div>
+        <a href="https://discord.com/invite/w5SWRTUhyS" target="_blank" class="btn-discord">
+          <svg width="18" height="14" viewBox="0 0 18 14" fill="currentColor"><path d="M15.245 1.188A14.764 14.764 0 0 0 11.496.3a.055.055 0 0 0-.059.028 10.337 10.337 0 0 0-.456.939 13.617 13.617 0 0 0-4.087 0 9.488 9.488 0 0 0-.464-.939.058.058 0 0 0-.058-.028 14.72 14.72 0 0 0-3.75.888.052.052 0 0 0-.024.021C.368 4.814-.22 8.33.068 11.8a.062.062 0 0 0 .023.042 14.84 14.84 0 0 0 4.47 2.264.058.058 0 0 0 .063-.021 10.61 10.61 0 0 0 .916-1.491.057.057 0 0 0-.031-.08 9.772 9.772 0 0 1-1.396-.667.058.058 0 0 1-.006-.096c.094-.07.188-.144.278-.218a.056.056 0 0 1 .058-.008 10.584 10.584 0 0 0 9.013 0 .056.056 0 0 1 .059.007c.09.074.184.149.279.219a.058.058 0 0 1-.005.096 9.166 9.166 0 0 1-1.397.666.057.057 0 0 0-.03.081c.267.516.572 1.009.915 1.49a.057.057 0 0 0 .063.022 14.796 14.796 0 0 0 4.479-2.264.058.058 0 0 0 .023-.041c.348-3.618-.583-6.761-2.47-9.559a.046.046 0 0 0-.024-.022ZM6.014 9.787c-.882 0-1.609-.812-1.609-1.808 0-.997.712-1.808 1.609-1.808.904 0 1.624.818 1.609 1.808 0 .996-.712 1.808-1.609 1.808Zm5.949 0c-.882 0-1.609-.812-1.609-1.808 0-.997.712-1.808 1.609-1.808.904 0 1.624.818 1.609 1.808 0 .996-.705 1.808-1.609 1.808Z"/></svg>
+          <span data-en="Join Discord Server" data-ar="انضم إلى سيرفر Discord">Join Discord Server</span>
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-inner">
+    <div class="footer-top">
+      <div class="footer-brand">
+        <a href="#hero" class="logo"><div class="logo-hex">KR</div>Knight Realistic</a>
+        <p data-en="The definitive visual experience for Assetto Corsa. Not affiliated with Kunos Simulazioni." data-ar="التجربة البصرية الأمثل لـ Assetto Corsa.">The definitive visual experience for Assetto Corsa.</p>
+      </div>
+      <div class="footer-col">
+        <h5 data-en="Products" data-ar="المنتجات">Products</h5>
+        <a href="#filter">PPFalter Filter</a>
+        <a href="#skins">SkinSRP Textures</a>
+        <a href="#skydoom">Sky Doom System</a>
+        <a href="#knighttool">Knight Tool App</a>
+      </div>
+      <div class="footer-col">
+        <h5 data-en="Community" data-ar="المجتمع">Community</h5>
+        <a href="https://www.youtube.com/@Knight_Realistic/videos" target="_blank">YouTube Channel</a>
+        <a href="https://discord.com/invite/w5SWRTUhyS" target="_blank">Discord Server</a>
+        <a href="#updates">Changelog</a>
+        <a href="#pricing">Pricing</a>
+      </div>
+      <div class="footer-col">
+        <h5 data-en="Links" data-ar="روابط">Links</h5>
+        <a href="https://www.patreon.com/cw/Knight_18/membership" target="_blank">Patreon</a>
+        <a href="#" data-en="Installation Guide" data-ar="دليل التثبيت">Installation Guide</a>
+        <a href="#" data-en="FAQ" data-ar="الأسئلة الشائعة">FAQ</a>
+        <a href="#" data-en="Terms of Service" data-ar="شروط الخدمة">Terms of Service</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p data-en="© 2025 Knight Realistic. All rights reserved." data-ar="© 2025 Knight Realistic. جميع الحقوق محفوظة.">© 2025 Knight Realistic. All rights reserved.</p>
+      <div class="socials">
+        <a href="https://discord.com/invite/w5SWRTUhyS" target="_blank" class="soc">D</a>
+        <a href="https://www.youtube.com/@Knight_Realistic/videos" target="_blank" class="soc">YT</a>
+        <a href="https://www.patreon.com/cw/Knight_18/membership" target="_blank" class="soc">P</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<script src="assets/js/main.js"></script>
+<script>
+// ─── PAGE LOADER ───────────────────────────────────────────────
+window.addEventListener('load', () => {
+  setTimeout(() => { document.getElementById('page-loader').classList.add('done'); }, 900);
+});
+
+// ─── GENERIC DRAG SLIDER (works with <img> now) ────────────────
+function makeSlider(wrapperId, handleId, lineId, afterId) {
+  const wrap   = document.getElementById(wrapperId);
+  const handle = document.getElementById(handleId);
+  const line   = document.getElementById(lineId);
+  const after  = document.getElementById(afterId);
+  if (!wrap || !handle) return;
+  let drag = false;
+  function set(pct) {
+    handle.style.left = (pct * 100) + '%';
+    if (line) line.style.left = (pct * 100) + '%';
+    after.style.clipPath = 'inset(0 ' + ((1 - pct) * 100) + '% 0 0)';
+  }
+  set(0.5);
+  handle.addEventListener('mousedown', e => { drag = true; e.preventDefault(); });
+  window.addEventListener('mouseup', () => drag = false);
+  window.addEventListener('mousemove', e => {
+    if (!drag) return;
+    const r = wrap.getBoundingClientRect();
+    set(Math.max(0, Math.min(1, (e.clientX - r.left) / r.width)));
+  });
+  handle.addEventListener('touchmove', e => {
+    const r = wrap.getBoundingClientRect();
+    set(Math.max(0, Math.min(1, (e.touches[0].clientX - r.left) / r.width)));
+    e.preventDefault();
+  }, { passive: false });
+}
+makeSlider('filter-slider', 'filter-handle', 'filter-line', 'filter-after');
+makeSlider('sky-slider',    'sky-handle',    'sky-line',    'sky-after');
+makeSlider('skin-slider',   'skin-handle',   'skin-line',   'skin-after');
+
+// ─── HELPER: swap img src with fade ───────────────────────────
+function swapImgs(wrapperId, beforeSrc, afterSrc, cb) {
+  const wrap = document.getElementById(wrapperId);
+  wrap.classList.add('fading');
+  setTimeout(() => {
+    const b = wrap.querySelector('.kr-sbefore');
+    const a = wrap.querySelector('.kr-safter');
+    if (beforeSrc) b.src = beforeSrc;
+    if (afterSrc)  a.src = afterSrc;
+    if (cb) cb();
+    wrap.classList.remove('fading');
+  }, 300);
+}
+
+// ─── FILTER ───────────────────────────────────────────────────
+// day    → assets/images/day-before.jpg  /  day-after.jpg
+// sunset → reuse day images (add sunset pair if you have them)
+// night  → assets/images/night-before.jpg / night-after.jpg
+const filterImgs = {
+  day:    { b: 'assets/images/day-before.jpg',   a: 'assets/images/day-after.jpg'   },
+sunset: { b: 'assets/images/sunset-before.jpg', a: 'assets/images/sunset-after.jpg' },
+  night:  { b: 'assets/images/night-before.jpg', a: 'assets/images/night-after.jpg' }
+};
+let fTime = 'day';
+window.filterSetTime = function(t, el) {
+  fTime = t;
+  document.querySelectorAll('#filter .kr-time-tab').forEach(b => b.classList.remove('active'));
+  el.classList.add('active');
+  const p = filterImgs[t] || filterImgs.day;
+  swapImgs('filter-slider', p.b, p.a);
+};
+// keep empty nav functions so existing HTML onclick doesn't error
+window.filterSetImg = window.filterNext = window.filterPrev = function(){};
+
+// ─── SKY DOOM ─────────────────────────────────────────────────
+// File name convention:
+//   sky/morning/sky112.jpg   = Sky Doom version  (AFTER)
+//   sky/morning/sky112d.jpg  = default/vanilla    (BEFORE)
+const skyData = {
+  morning:   [
+    { b:'sky/morning/sky112d.jpg',   a:'sky/morning/sky112.jpg'   },
+    { b:'sky/morning/sky212d.jpg',   a:'sky/morning/sky212.jpg'   },
+    { b:'sky/morning/sky312d.jpg',   a:'sky/morning/sky312.jpg'   },
+    { b:'sky/morning/sky412d.jpg',   a:'sky/morning/sky412.jpg'   }
+  ],
+  afternoon: [
+    { b:'sky/afternoon/sky116d.jpg', a:'sky/afternoon/sky116.jpg' },
+    { b:'sky/afternoon/sky216d.jpg', a:'sky/afternoon/sky216.jpg' },
+    { b:'sky/afternoon/sky316d.jpg', a:'sky/afternoon/sky316.jpg' },
+    { b:'sky/afternoon/sky416d.jpg', a:'sky/afternoon/sky416.jpg' }
+  ],
+  night:     [
+    { b:'sky/night/sky121d.jpg',     a:'sky/night/sky121.jpg'     },
+    { b:'sky/night/sky221d.jpg',     a:'sky/night/sky221.jpg'     },
+    { b:'sky/night/sky321d.jpg',     a:'sky/night/sky321.jpg'     },
+    { b:'sky/night/sky421d.jpg',     a:'sky/night/sky421.jpg'     }
+  ]
+};
+let skyTime = 'morning', skyIdx = 0;
+function skyUpd() {
+  const p = skyData[skyTime][skyIdx];
+  swapImgs('sky-slider', p.b, p.a);
+  document.querySelectorAll('#sky-dots .kr-idot').forEach((d, i) => d.classList.toggle('active', i === skyIdx));
+}
+window.skySetTime = function(t, el) {
+  skyTime = t; skyIdx = 0;
+  document.querySelectorAll('#skydoom .kr-time-tab').forEach(b => b.classList.remove('active'));
+  el.classList.add('active');
+  skyUpd();
+};
+window.skySetImg  = function(i) { skyIdx = i; skyUpd(); };
+window.skyNext    = function()  { skyIdx = (skyIdx + 1) % 4; skyUpd(); };
+window.skyPrev    = function()  { skyIdx = (skyIdx - 1 + 4) % 4; skyUpd(); };
+
+// ─── SKINS ────────────────────────────────────────────────────
+// File names: "skins default_1.jpg" … "skins v1.4_6.jpg"
+// The before image is always the "default" variant
+const skinVariants = {
+  default: { label: 'Default',      folder: 'default' },
+  v12:     { label: 'SkinSRP v1.2', folder: 'v1.2'    },
+  v13:     { label: 'SkinSRP v1.3', folder: 'v1.3'    },
+  v14:     { label: 'SkinSRP v1.4', folder: 'v1.4'    }
+};
+let sVar = 'v12', sIdx = 0;
+function skinPath(variant, n) {
+  return 'assets/images/skins ' + variant + '_' + n + '.jpg';
+}
+function sUpd() {
+  const v   = skinVariants[sVar];
+  const num = sIdx + 1;
+  const b   = skinPath('default', num);
+  const a   = skinPath(v.folder, num);
+  swapImgs('skin-slider', b, a, () => {
+    document.getElementById('skin-after-label').textContent = v.label;
+  });
+  document.querySelectorAll('#skin-dots .kr-idot').forEach((d, i) => d.classList.toggle('active', i === sIdx));
+}
+window.skinSetVariant = function(v, el) {
+    sVar = v;
+  document.querySelectorAll('.skin-tab-btn').forEach(b => b.classList.remove('active'));
+  el.classList.add('active');
+  sUpd();
+};
+window.skinSetImg = function(i) { sIdx = i; sUpd(); };
+window.skinNext   = function()  { sIdx = (sIdx + 1) % 6; sUpd(); };
+window.skinPrev   = function()  { sIdx = (sIdx - 1 + 6) % 6; sUpd(); };
+
+// ─── FIRE CANVAS ──────────────────────────────────────────────
+(function () {
+  const canvas = document.getElementById('fire-canvas'); if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  function resize() { const r = canvas.parentElement.getBoundingClientRect(); canvas.width = r.width || 400; canvas.height = r.height || 220; }
+  resize(); window.addEventListener('resize', resize);
+  const pals = {
+    classic: ['#ff0000','#ff3300','#ff6600','#ff9900','#ffcc00','#ffee44'],
+    blue:    ['#0033ff','#0066ff','#0099ff','#00ccff','#66ddff','#aaeeff'],
+    green:   ['#00cc00','#33ff00','#66ff33','#99ff66','#ccff99','#eeffcc'],
+    white:   ['#ffffff','#ffffee','#ffffcc','#ffffaa','#ffdd88','#ffbb44']
+  };
+  let mode = 'classic', intensity = 0.7;
+  window.setFire = function(m, el) {
+    mode = m;
+    document.querySelectorAll('.fbtn').forEach(b => b.classList.remove('active'));
+    el.classList.add('active');
+  };
+  window.setFireInt = function(v) { intensity = v / 100; document.getElementById('fire-val').textContent = v + '%'; };
+  const pts = [];
+  function spawn() {
+    const W = canvas.width, H = canvas.height;
+    return { x: W/2 + (Math.random()-.5)*W*.65*intensity, y: H, vx: (Math.random()-.5)*2*intensity, vy: -(Math.random()*3+2)*intensity, life: 0, maxLife: 60+Math.random()*60, size: (Math.random()*8+4)*intensity };
+  }
+  for (let i = 0; i < 80; i++) pts.push(spawn());
+  function draw() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    const pal = pals[mode];
+    pts.forEach((p, i) => {
+      p.x += p.vx; p.y += p.vy; p.life++; p.x += Math.sin(p.life*.1)*.7;
+      const r = p.life / p.maxLife;
+      const ci = Math.min(Math.floor(r * (pal.length-1)), pal.length-1);
+      ctx.save(); ctx.globalAlpha = (1-r)*.9; ctx.shadowBlur = 20*intensity; ctx.shadowColor = pal[ci]; ctx.fillStyle = pal[ci];
+      ctx.beginPath(); ctx.arc(p.x, p.y, p.size*(1-r*.5), 0, Math.PI*2); ctx.fill(); ctx.restore();
+      if (r >= 1) pts[i] = spawn();
+    });
+    if (Math.random() < intensity*.4) pts.push(spawn());
+    if (pts.length > 200) pts.shift();
+    requestAnimationFrame(draw);
+  }
+  draw();
+})();
+</script>
+</body>
+</html>
