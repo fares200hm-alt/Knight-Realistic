@@ -1,15 +1,14 @@
 // ── CURSOR ──
-const dot = document.getElementById('cur-dot'), ring = document.getElementById('cur-ring');
-let mx = 0, my = 0, rx = 0, ry = 0;
-document.addEventListener('mousemove', e => {
-  mx = e.clientX; my = e.clientY;
-  dot.style.left = mx + 'px'; dot.style.top = my + 'px';
-});
-(function raf() {
-  rx += (mx - rx) * .1; ry += (my - ry) * .1;
-  ring.style.left = rx + 'px'; ring.style.top = ry + 'px';
-  requestAnimationFrame(raf);
-})();
+const dot = document.getElementById('cur-dot');
+const ring = document.getElementById('cur-ring');
+if (ring) ring.style.display = 'none';
+if (dot) {
+  dot.style.willChange = 'transform';
+  dot.style.top = '0'; dot.style.left = '0';
+  document.addEventListener('mousemove', e => {
+    dot.style.transform = `translate(${e.clientX - 4}px,${e.clientY - 4}px)`;
+  }, { passive: true });
+}
 
 // ── NAV + PROGRESS BAR ──
 const nav = document.getElementById('nav');
@@ -33,28 +32,31 @@ document.querySelectorAll('a[href^="#"]').forEach(a => {
   });
 });
 
-// ── HERO PARALLAX ──
-window.addEventListener('scroll', () => {
+// ── HERO PARALLAX (cached + throttled) ──
+(function(){
   const el = document.querySelector('.hero-svg');
-  if (el) el.style.transform = `translateY(${scrollY * .3}px)`;
-});
+  if (!el) return;
+  let ticking = false;
+  window.addEventListener('scroll', () => {
+    if (!ticking) { ticking = true; requestAnimationFrame(() => { el.style.transform = `translateY(${scrollY * .3}px)`; ticking = false; }); }
+  });
+})();
 
-// ── NOISE CANVAS ──
+// ── NOISE CANVAS (static — generated once, not per frame) ──
 (function () {
   const c = document.getElementById('noise');
+  if (!c) return;
   const ctx = c.getContext('2d');
-  let W, H;
-  function rsz() { W = c.width = innerWidth; H = c.height = innerHeight; }
-  window.addEventListener('resize', rsz); rsz();
-  function n() {
-    const d = ctx.createImageData(W, H); const dt = d.data;
+  function draw() {
+    c.width = 256; c.height = 256;
+    const d = ctx.createImageData(256, 256); const dt = d.data;
     for (let i = 0; i < dt.length; i += 4) {
       const v = Math.random() * 255 | 0;
       dt[i] = dt[i + 1] = dt[i + 2] = v; dt[i + 3] = 255;
     }
-    ctx.putImageData(d, 0, 0); requestAnimationFrame(n);
+    ctx.putImageData(d, 0, 0);
   }
-  n();
+  draw();
 })();
 
 // ══════════════════════════════════════════

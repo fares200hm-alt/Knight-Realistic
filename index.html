@@ -17,6 +17,12 @@
 @keyframes lpulse{from{opacity:.4}to{opacity:1}}
 @keyframes lbar{from{width:0}to{width:100%}}
 
+/* CSS GLOWS بدل SVG feGaussianBlur */
+.hero-glow-1,.hero-glow-2,.hero-glow-3{position:absolute;border-radius:50%;pointer-events:none;filter:blur(90px);will-change:opacity}
+.hero-glow-1{width:900px;height:500px;top:0;left:50%;transform:translateX(-50%);background:radial-gradient(ellipse,rgba(200,0,17,.48) 0%,transparent 70%)}
+.hero-glow-2{width:600px;height:320px;bottom:0;left:-5%;background:radial-gradient(ellipse,rgba(80,0,9,.4) 0%,transparent 70%)}
+.hero-glow-3{width:500px;height:280px;top:0;right:-5%;background:radial-gradient(ellipse,rgba(32,0,7,.35) 0%,transparent 70%)}
+
 /* INTERACTIVE SLIDER */
 .kr-slider-wrap{position:relative;border-radius:12px;overflow:hidden;box-shadow:0 0 60px rgba(255,26,46,.12),0 0 120px rgba(0,0,0,.5);border:1px solid rgba(255,255,255,.08);aspect-ratio:16/10;user-select:none;transition:opacity .3s;background:#0a0a12}
 .kr-slider-wrap.fading{opacity:0}
@@ -135,19 +141,9 @@
 <!-- HERO -->
 <section id="hero">
   <div class="hero-bg">
-    <svg class="hero-svg" viewBox="0 0 1600 900" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice">
-      <defs>
-        <radialGradient id="h1" cx="50%" cy="40%" r="70%"><stop offset="0%" stop-color="#cc0011" stop-opacity=".5"/><stop offset="100%" stop-color="#000" stop-opacity="0"/></radialGradient>
-        <radialGradient id="h2" cx="18%" cy="82%" r="45%"><stop offset="0%" stop-color="#500009" stop-opacity=".42"/><stop offset="100%" stop-color="#000" stop-opacity="0"/></radialGradient>
-        <radialGradient id="h3" cx="88%" cy="14%" r="38%"><stop offset="0%" stop-color="#200007" stop-opacity=".38"/><stop offset="100%" stop-color="#000" stop-opacity="0"/></radialGradient>
-        <filter id="blur55"><feGaussianBlur stdDeviation="55"/></filter>
-      </defs>
-      <rect width="1600" height="900" fill="#050507"/>
-      <ellipse cx="800" cy="360" rx="720" ry="390" fill="url(#h1)" filter="url(#blur55)"><animate attributeName="rx" values="720;800;720" dur="9s" repeatCount="indefinite"/></ellipse>
-      <ellipse cx="290" cy="738" rx="430" ry="230" fill="url(#h2)" filter="url(#blur55)"><animate attributeName="cx" values="290;340;290" dur="12s" repeatCount="indefinite"/></ellipse>
-      <ellipse cx="1440" cy="126" rx="330" ry="190" fill="url(#h3)" filter="url(#blur55)"><animate attributeName="cy" values="126;100;126" dur="8s" repeatCount="indefinite"/></ellipse>
-      <rect x="0" y="758" width="1600" height="142" fill="#030003"/>
-    </svg>
+    <div class="hero-glow-1"></div>
+    <div class="hero-glow-2"></div>
+    <div class="hero-glow-3"></div>
   </div>
   <div class="hero-overlay"></div>
   <div class="hero-grid"></div>
@@ -666,6 +662,42 @@
         </ul>
         <a href="https://www.patreon.com/cw/Knight_18/membership" target="_blank" class="btn-r" style="width:100%;text-align:center;display:block" data-en="Subscribe — $15/mo" data-ar="اشترك — 15$/شهر">Subscribe — $15/mo</a>
       </div>
+    </div>
+  </div>
+</section>
+
+<!-- COMMENTS -->
+<section id="comments" style="padding:5rem 0;background:#080810;border-top:1px solid rgba(255,26,46,.08)">
+  <div class="wrap" style="max-width:820px;margin:0 auto">
+    <div style="text-align:center;margin-bottom:2.5rem">
+      <div class="sec-lbl" style="justify-content:center" data-en="Community" data-ar="المجتمع">Community</div>
+      <h2 class="sec-title" style="text-align:center" data-en="Comments & Reviews" data-ar="التعليقات والتقييمات">Comments &amp; Reviews</h2>
+      <p class="sec-desc" style="text-align:center;margin:0 auto" data-en="Share your experience with Knight Realistic." data-ar="شارك تجربتك مع Knight Realistic.">Share your experience with Knight Realistic.</p>
+    </div>
+    <!-- Giscus comments widget — requires GitHub Discussions enabled on your repo -->
+    <!-- Setup: go to https://giscus.app — enter your GitHub repo → copy the script below -->
+    <div id="giscus-container" style="min-height:120px">
+      <script src="https://giscus.app/client.js"
+        data-repo="GITHUB_USERNAME/REPO_NAME"
+        data-repo-id="REPO_ID"
+        data-category="Comments"
+        data-category-id="CATEGORY_ID"
+        data-mapping="pathname"
+        data-strict="0"
+        data-reactions-enabled="1"
+        data-emit-metadata="0"
+        data-input-position="top"
+        data-theme="dark_dimmed"
+        data-lang="en"
+        crossorigin="anonymous"
+        async>
+      </script>
+      <!-- Placeholder shown until Giscus is configured -->
+      <noscript>
+        <div style="padding:2rem;text-align:center;border:1px solid rgba(255,255,255,.08);border-radius:12px;color:rgba(255,255,255,.4);font-family:'JetBrains Mono',monospace;font-size:.75rem">
+          Comments require JavaScript. <a href="https://discord.com/invite/w5SWRTUhyS" style="color:#ff1a2e">Join Discord</a> to share feedback.
+        </div>
+      </noscript>
     </div>
   </div>
 </section>
